@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Neat Games</title>
+  <meta name="description" content="Small offline logic games. No ads, no tracking.">
+
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#047857">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+
+  <script>
+    (function () {
+      var saved = localStorage.getItem('theme');
+      if (saved && saved !== 'system') document.documentElement.setAttribute('data-theme', saved);
+    })();
+  </script>
+
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    .hub { max-width: 560px; margin: 0 auto; padding: 2rem 1rem; }
+    .hub h1 { font-size: 1.8rem; margin: 0 0 0.25rem; }
+    .hub .tagline { color: var(--muted); margin: 0 0 1.5rem; }
+    .tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem; }
+    .tile {
+      display: block; text-decoration: none; color: var(--fg);
+      background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 1.2rem; transition: border-color 0.15s, transform 0.1s;
+    }
+    .tile:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .tile .art {
+      width: 56px; height: 56px; border-radius: 10px; background: var(--accent);
+      display: flex; align-items: center; justify-content: center; margin-bottom: 0.7rem;
+    }
+    .tile .art svg { width: 60%; height: 60%; color: #fff; }
+    .tile h2 { font-size: 1.1rem; margin: 0 0 0.2rem; }
+    .tile p { margin: 0; color: var(--muted); font-size: 0.85rem; }
+  </style>
+</head>
+<body>
+  <main class="hub">
+    <h1>Neat Games</h1>
+    <p class="tagline">Small offline logic games. No ads, no tracking.</p>
+    <div class="tiles">
+      <a class="tile" href="/crowns/">
+        <span class="art" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 8l4 4 5-7 5 7 4-4-2 11H5L3 8z"/></svg>
+        </span>
+        <h2>Crowns</h2>
+        <p>One per row, column &amp; color region. A daily puzzle + endless play.</p>
+      </a>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    Part of <a href="https://keepitneat.app">Keep It Neat</a> — open source, no ads, no tracking.
+  </footer>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('/service-worker.js', { scope: '/' });
+      });
+    }
+  </script>
+</body>
+</html>
