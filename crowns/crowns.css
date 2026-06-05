@@ -84,3 +84,29 @@
   .cell:hover { filter: none; }
 }
 .howto ol { margin: 0.5rem 0 0; padding-left: 1.2rem; }
+
+/* ── Direction B polish (soft-toy, Fredoka) — overrides above ───── */
+body {
+  background: radial-gradient(125% 125% at 0% 0%, #eafaf3 0%, #cdeede 100%);
+  min-height: 100vh;
+}
+@media (prefers-color-scheme: dark) {
+  body { background: radial-gradient(125% 125% at 0% 0%, #10201b 0%, #0b1512 100%); }
+}
+[data-theme="light"] body { background: radial-gradient(125% 125% at 0% 0%, #eafaf3 0%, #cdeede 100%); }
+[data-theme="dark"] body { background: radial-gradient(125% 125% at 0% 0%, #10201b 0%, #0b1512 100%); }
+
+.topbar h1, .win h2, .howto summary { font-family: var(--font-display); }
+.topbar h1 { font-weight: 700; }
+.pill { font-family: var(--font-display); font-weight: 600; }
+
+.actions button {
+  border-radius: 14px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(4, 120, 87, 0.10);
+}
+.seg { border-radius: 12px; }
+.iconbtn { border-radius: 12px; }
+.settings-panel { border-radius: 20px; box-shadow: 0 10px 26px rgba(4, 120, 87, 0.10); }
+.win { border-radius: 20px; }
