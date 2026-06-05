@@ -66,6 +66,7 @@ export function findForcedX(board) {
     }
   }
 
+  // Bounded: only used for n<=8 boards, so the per-cell countSolutions calls stay cheap.
   // Tier 2 — deduction. fixed reflects current crowns (consistent here).
   const fixed = fixedFromCells(cells, n);
   if (fixed === null) return { type: 'fix' };

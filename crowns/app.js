@@ -10,6 +10,7 @@ import { findForcedX } from './solver.js';
 import { generate } from './generate.js';
 import { dailyPuzzle, DAILY_N } from './daily.js';
 import { resultText } from './share.js';
+import { formatTime, cap } from './format.js';
 import { tokenSvg, normalizeSkin } from './skins.js';
 import {
   loadSettings, saveSettings,
@@ -40,6 +41,7 @@ const state = {
 function todayStr() {
   const d = new Date();
   const p = (x) => String(x).padStart(2, '0');
+  // Local date on purpose: "today's puzzle" should follow the player's calendar day.
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
 }
 
@@ -73,6 +75,7 @@ function buildPuzzle() {
     state.timer.elapsedMs = saved.elapsedMs || 0;
     state.solved = !!saved.solved;
   }
+  checkSolved();
 }
 
 function newEndless() {
@@ -120,13 +123,6 @@ function stopTimer() {
     state.timer.intervalId = null;
   }
 }
-function formatTime(ms) {
-  const total = Math.floor(ms / 1000);
-  const m = String(Math.floor(total / 60)).padStart(2, '0');
-  const s = String(total % 60).padStart(2, '0');
-  return `${m}:${s}`;
-}
-
 // --- rendering ---
 
 function regionColor(id) {
@@ -143,8 +139,8 @@ function render() {
 
 function renderBoard() {
   const { board, puzzle } = state;
-  const board2 = $('board');
-  board2.style.setProperty('--n', puzzle.n);
+  const boardEl = $('board');
+  boardEl.style.setProperty('--n', puzzle.n);
   const conflictSet = state.settings.conflictHighlight
     ? conflicts(board.cells, board.regions, puzzle.n)
     : new Set();
@@ -167,9 +163,9 @@ function renderBoard() {
   }
   const prevIndex = document.activeElement && document.activeElement.dataset
     ? document.activeElement.dataset.index : undefined;
-  board2.replaceChildren(frag);
+  boardEl.replaceChildren(frag);
   if (prevIndex !== undefined) {
-    const refocus = board2.querySelector(`[data-index="${prevIndex}"]`);
+    const refocus = boardEl.querySelector(`[data-index="${prevIndex}"]`);
     if (refocus) refocus.focus();
   }
 }
@@ -229,8 +225,6 @@ function renderWin() {
   win.classList.toggle('hidden', !state.solved);
   if (state.solved) $('win-time').textContent = `Time: ${formatTime(currentElapsed())}`;
 }
-
-function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
 
 function toast(msg) {
   $('toast').textContent = msg;
@@ -350,6 +344,22 @@ function wire() {
   $('board').addEventListener('click', (e) => {
     const cell = e.target.closest('.cell');
     if (cell) onCellClick(Number(cell.dataset.index));
+  });
+  $('board').addEventListener('keydown', (e) => {
+    const cell = e.target.closest('.cell');
+    if (!cell) return;
+    const n = state.puzzle.n;
+    const i = Number(cell.dataset.index);
+    let t;
+    if (e.key === 'ArrowRight') { if (i % n === n - 1) return; t = i + 1; }
+    else if (e.key === 'ArrowLeft') { if (i % n === 0) return; t = i - 1; }
+    else if (e.key === 'ArrowUp') { t = i - n; }
+    else if (e.key === 'ArrowDown') { t = i + n; }
+    else return;
+    if (t < 0 || t >= n * n) return;
+    e.preventDefault();
+    const next = $('board').querySelector(`[data-index="${t}"]`);
+    if (next) next.focus();
   });
   $('undo').addEventListener('click', onUndo);
   $('hint').addEventListener('click', onHint);

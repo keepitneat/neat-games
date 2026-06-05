@@ -5,6 +5,7 @@
 
 import { isSolved } from './rules.js';
 
+// Cap undo history so a long session can't grow memory without bound; 100 moves is far more than any single puzzle needs.
 const HISTORY_CAP = 100;
 
 export function createBoard(n, regions) {
