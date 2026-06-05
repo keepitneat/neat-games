@@ -38,6 +38,10 @@
     .tile .art svg { width: 60%; height: 60%; color: #fff; }
     .tile h2 { font-size: 1.1rem; margin: 0 0 0.2rem; }
     .tile p { margin: 0; color: var(--muted); font-size: 0.85rem; }
+    @media (prefers-reduced-motion: reduce) {
+      .tile { transition: border-color 0.15s; }
+      .tile:hover { transform: none; }
+    }
   </style>
 </head>
 <body>

@@ -158,14 +158,20 @@ function renderBoard() {
     cell.className = 'cell' + (conflictSet.has(i) ? ' conflict' : '');
     cell.style.background = regionColor(puzzle.regions[i]);
     cell.dataset.index = String(i);
-    cell.setAttribute('role', 'gridcell');
     const value = board.cells[i];
     if (value === 'crown') cell.innerHTML = tokenSvg(skin);
     else if (value === 'x') cell.innerHTML = '<span class="x" aria-hidden="true">&times;</span>';
-    cell.setAttribute('aria-label', `Row ${r + 1}, column ${c + 1}: ${value}`);
+    const conflictNote = conflictSet.has(i) ? ' (conflict)' : '';
+    cell.setAttribute('aria-label', `Row ${r + 1}, column ${c + 1}: ${value}${conflictNote}`);
     frag.appendChild(cell);
   }
+  const prevIndex = document.activeElement && document.activeElement.dataset
+    ? document.activeElement.dataset.index : undefined;
   board2.replaceChildren(frag);
+  if (prevIndex !== undefined) {
+    const refocus = board2.querySelector(`[data-index="${prevIndex}"]`);
+    if (refocus) refocus.focus();
+  }
 }
 
 function renderStatus() {
@@ -375,4 +381,3 @@ state.mode = location.hash === '#endless' ? 'endless' : 'daily';
 buildPuzzle();
 wire();
 render();
-if (state.solved) renderWin();
