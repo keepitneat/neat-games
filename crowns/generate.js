@@ -64,6 +64,10 @@ export function growRegions(rng, n, seeds) {
   return regions;
 }
 
+// Attempt budget. Benchmarking showed the original 500×6 budget fails ~9% of 8×8
+// seeds (the date-seeded Daily would fail ~1 day in 11); 2000×10 gives 0 failures
+// for n<=8. The generator reliably tops out at 8×8 — 9×9/10×10 need a smarter
+// generator (Linear NEAT-82). Easy 6 / Medium 7 / Hard 8 / Daily 8 all sit in range.
 const MAX_ATTEMPTS = 2000;
 
 // Generate a uniquely-solvable puzzle. Re-grows regions (and re-lays out as
@@ -74,7 +78,7 @@ export function generate(rng, n) {
     if (!solution) continue;
     const seeds = solution.map((c, r) => r * n + c);
     // A few region re-grows per layout before abandoning it.
-    for (let grow = 0; grow < 10; grow++) {
+    for (let grow = 0; grow < 10; grow++) { // re-grow regions a few times per layout
       const regions = growRegions(rng, n, seeds);
       if (countSolutions(regions, n, null, 2) === 1) {
         return { n, regions, solution };
