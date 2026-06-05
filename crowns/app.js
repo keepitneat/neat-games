@@ -2,12 +2,13 @@
 /* The only file that touches the DOM. Wires the pure engine modules to the
  * board UI, settings, timer, persistence, and the daily/endless modes. */
 
-import { makeRng, seedFromDate } from '../shared/rng.js';
+import { makeRng } from '../shared/rng.js';
 import { makeStore } from '../shared/store.js';
 import { createBoard, cycleValue, commit, undo, reset, boardIsSolved } from './board.js';
 import { attackedCells, conflicts } from './rules.js';
 import { findForcedX } from './solver.js';
 import { generate } from './generate.js';
+import { dailyPuzzle, DAILY_N } from './daily.js';
 import { tokenSvg, normalizeSkin } from './skins.js';
 import {
   loadSettings, saveSettings,
@@ -17,7 +18,6 @@ import {
 
 const DIFFICULTY = { easy: 6, medium: 7, hard: 8 };
 const DIFFICULTY_ORDER = ['easy', 'medium', 'hard'];
-const DAILY_N = 8; // Daily is always 8×8 (generator's reliable max; see spec Known limitations)
 const PALETTE = ['#c7b8ea', '#f6c89a', '#9ec5f0', '#a8d5a2', '#e8716a',
   '#eef07e', '#cbd5d1', '#f3b0c3', '#b8e0d2', '#d9c2a0'];
 
@@ -50,8 +50,7 @@ function gameKey() {
 
 function buildPuzzle() {
   if (state.mode === 'daily') {
-    state.seed = seedFromDate(state.dateStr);
-    state.puzzle = generate(makeRng(state.seed), DAILY_N);
+    state.puzzle = dailyPuzzle(state.dateStr);
   } else {
     const meta = loadGame(store, 'endless-meta');
     if (meta && DIFFICULTY[meta.difficulty]) {
