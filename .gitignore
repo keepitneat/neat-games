@@ -1,0 +1,11 @@
+# Personal-only permission rules
+.claude/settings.local.json
+
+# Local specs/plans/notes — stay local, never committed (house rule)
+docs/
+
+# OS cruft
+.DS_Store
+
+# Brainstorm companion artifacts
+.superpowers/
