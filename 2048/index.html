@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>2048 — Neat Games</title>
+  <meta name="description" content="Slide and merge tiles to reach 2048. No ads, no tracking.">
+
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#047857">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+
+  <script>
+    (function () {
+      var saved = localStorage.getItem('theme');
+      if (saved && saved !== 'system') document.documentElement.setAttribute('data-theme', saved);
+    })();
+  </script>
+
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/2048/2048.css">
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <div class="left">
+        <a class="iconbtn" href="/" aria-label="Back to Neat Games">&larr;</a>
+        <h1>2048</h1>
+      </div>
+      <div class="left">
+        <span class="seg" role="group" aria-label="Theme">
+          <button data-theme-set="system" aria-pressed="true">Sys</button>
+          <button data-theme-set="light" aria-pressed="false">Light</button>
+          <button data-theme-set="dark" aria-pressed="false">Dark</button>
+        </span>
+      </div>
+    </div>
+
+    <div class="scores">
+      <div class="score-box"><div class="label">Score</div><div class="value" id="score">0</div></div>
+      <div class="score-box"><div class="label">Best</div><div class="value" id="best">0</div></div>
+    </div>
+
+    <div id="board" class="board" aria-label="2048 board">
+      <div id="cells" class="cells"></div>
+      <div id="tiles" class="tiles"></div>
+      <div id="overlay" class="overlay hidden">
+        <h2 id="overlay-title"></h2>
+        <div class="row" id="overlay-actions"></div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <span class="hint">Use arrow keys or swipe.</span>
+      <button id="new-game" class="newgame" type="button">New game</button>
+    </div>
+
+    <p id="status" class="status-live" role="status" aria-live="polite"></p>
+
+    <details class="howto">
+      <summary>How to play</summary>
+      <ol>
+        <li>Swipe or press arrow keys to slide all tiles.</li>
+        <li>Two tiles with the same number merge into their sum.</li>
+        <li>Reach the 2048 tile — then keep going for a higher score.</li>
+      </ol>
+    </details>
+  </div>
+
+  <footer class="site-footer">
+    Part of <a href="https://keepitneat.app">Keep It Neat</a> — no ads, no tracking.
+  </footer>
+
+  <script type="module" src="/2048/app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('/service-worker.js', { scope: '/' });
+      });
+    }
+  </script>
+</body>
+</html>
