@@ -9,6 +9,7 @@ import { attackedCells, conflicts } from './rules.js';
 import { findForcedX } from './solver.js';
 import { generate } from './generate.js';
 import { dailyPuzzle, DAILY_N } from './daily.js';
+import { resultText } from './share.js';
 import { tokenSvg, normalizeSkin } from './skins.js';
 import {
   loadSettings, saveSettings,
@@ -284,26 +285,16 @@ function checkSolved() {
   if (state.mode === 'daily') recordDailySolve(store, state.dateStr);
 }
 
-function buildResultText() {
-  const { puzzle, board } = state;
-  const head = state.mode === 'daily'
-    ? `Crowns — ${state.dateStr}`
-    : `Crowns — Endless (${cap(state.difficulty)})`;
-  const squares = ['🟪', '🟧', '🟦', '🟩', '🟥', '🟨', '⬜', '🟫', '🟩', '🟧'];
-  let grid = '';
-  for (let r = 0; r < puzzle.n; r++) {
-    for (let c = 0; c < puzzle.n; c++) {
-      const i = r * puzzle.n + c;
-      grid += board.cells[i] === 'crown' ? '👑' : squares[puzzle.regions[i] % squares.length];
-    }
-    grid += '\n';
-  }
-  return `${head} · ${formatTime(currentElapsed())}\n${grid}keepitneat.app`;
-}
-
 async function onCopyResult() {
   try {
-    await navigator.clipboard.writeText(buildResultText());
+    await navigator.clipboard.writeText(resultText({
+      mode: state.mode,
+      dateStr: state.dateStr,
+      difficulty: state.difficulty,
+      n: state.puzzle.n,
+      regions: state.puzzle.regions,
+      elapsedMs: currentElapsed(),
+    }));
     toast('Result copied to clipboard!');
   } catch {
     toast('Copy failed — clipboard not available.');
