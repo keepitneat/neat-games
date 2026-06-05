@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Crowns — Neat Games</title>
+  <meta name="description" content="A one-per-row, column, and color-region logic puzzle. No ads, no tracking.">
+
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#047857">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+
+  <!-- FOUC: apply theme before CSS loads. Mirrors shared/theme.js by hand. -->
+  <script>
+    (function () {
+      var saved = localStorage.getItem('theme');
+      if (saved && saved !== 'system') document.documentElement.setAttribute('data-theme', saved);
+    })();
+  </script>
+
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/crowns/crowns.css">
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <div class="left">
+        <a class="iconbtn" href="/" aria-label="Back to Neat Games">&larr;</a>
+        <h1>Crowns</h1>
+      </div>
+      <div class="left">
+        <div class="seg" role="group" aria-label="Mode">
+          <button id="mode-daily" aria-pressed="true">Daily</button>
+          <button id="mode-endless" aria-pressed="false">Endless</button>
+        </div>
+        <button id="settings-toggle" class="iconbtn" aria-label="Settings"
+                aria-expanded="false" aria-controls="settings-panel">&#9881;</button>
+      </div>
+    </div>
+
+    <div class="statusrow">
+      <span id="status-left">&nbsp;</span>
+      <span class="right">
+        <button id="difficulty-btn" class="seg" hidden></button>
+        <span id="streak" class="pill" hidden></span>
+        <span id="timer" class="timer">00:00</span>
+        <button id="new-puzzle" hidden>New puzzle</button>
+      </span>
+    </div>
+
+    <div id="settings-panel" class="settings-panel hidden" role="dialog" aria-label="Settings">
+      <h2>Settings</h2>
+      <label class="row"><span>Auto-X (mark attacked cells)</span><input type="checkbox" id="set-autox"></label>
+      <label class="row"><span>Highlight conflicts</span><input type="checkbox" id="set-conflict"></label>
+      <label class="row"><span>Show timer</span><input type="checkbox" id="set-timer"></label>
+      <div class="row"><span>Token</span>
+        <span class="seg" role="group" aria-label="Token">
+          <button id="skin-crown" aria-pressed="true">Crown</button>
+          <button id="skin-cat" aria-pressed="false">Cat</button>
+        </span>
+      </div>
+      <div class="row"><span>Theme</span>
+        <span class="seg" role="group" aria-label="Theme">
+          <button data-theme-set="system" aria-pressed="false">System</button>
+          <button data-theme-set="light" aria-pressed="false">Light</button>
+          <button data-theme-set="dark" aria-pressed="false">Dark</button>
+        </span>
+      </div>
+    </div>
+
+    <div id="board" class="board" role="grid" aria-label="Crowns board"></div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <div id="win" class="win hidden">
+      <h2>Solved! &#128081;</h2>
+      <p id="win-time"></p>
+      <button id="copy-result">Copy result</button>
+    </div>
+
+    <div class="actions">
+      <button id="undo">&#8630; Undo</button>
+      <button id="hint" class="hint">&#128161; Hint</button>
+      <button id="reset">&#8635; Reset</button>
+    </div>
+
+    <details class="howto">
+      <summary>How to play</summary>
+      <ol>
+        <li>Place exactly one crown in each row, column, and color region.</li>
+        <li>Tap once for X, tap again for a crown, again to clear.</li>
+        <li>Two crowns can't touch — not even diagonally.</li>
+      </ol>
+    </details>
+  </div>
+
+  <footer class="site-footer">
+    Part of <a href="https://keepitneat.app">Keep It Neat</a> — no ads, no tracking.
+  </footer>
+
+  <script type="module" src="/crowns/app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('/service-worker.js', { scope: '/' });
+      });
+    }
+  </script>
+</body>
+</html>
