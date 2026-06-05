@@ -55,6 +55,11 @@ body {
 }
 a { color: var(--accent); }
 
+/* Readable text selection in both themes (accent bg + bg-colored text are
+   always high-contrast opposites). */
+::selection { background: var(--accent); color: var(--bg); }
+::-moz-selection { background: var(--accent); color: var(--bg); }
+
 button {
   font-family: inherit;
   font-size: 1rem;
