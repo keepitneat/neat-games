@@ -2,13 +2,14 @@
  * Bump CACHE_VERSION on any change to the import graph (new module -> add to
  * APP_SHELL AND bump the version). */
 
-const CACHE_VERSION = 'v6';
+const CACHE_VERSION = 'v7';
 const CACHE_NAME = `neat-games-${CACHE_VERSION}`;
 
 const APP_SHELL = [
   '/',
   '/index.html',
   '/styles.css',
+  '/fonts/fredoka.woff2',
   '/manifest.json',
   '/shared/rng.js',
   '/shared/store.js',
