@@ -116,9 +116,9 @@ function applyMove(dir) {
       if (consumed) { consumed.remove(); nodes.delete(mg.consumedId); }
       const survivor = nodes.get(mg.id);
       if (survivor) {
-        setTileValue(survivor, mg.value);
-        survivor.firstChild.textContent = mg.value;
         const inner = survivor.firstChild;
+        setTileValue(survivor, mg.value);
+        inner.textContent = mg.value;
         inner.classList.remove('merged');
         void inner.offsetWidth; // restart animation
         inner.classList.add('merged');
@@ -133,8 +133,8 @@ function applyMove(dir) {
       nodes.set(sp.spawned.id, el);
       $('tiles').appendChild(el);
     }
-    persist();
     checkEnd();
+    persist();
     state.animating = false;
   };
 

@@ -68,6 +68,12 @@ test('move up: a column of two 2s merges at the top', () => {
   assert.deepEqual(r.tiles, [{ id: 1, r: 0, c: 2, value: 4 }]);
 });
 
+test('move down: a column of two 2s merges at the bottom (lower tile survives)', () => {
+  const tiles = [T(1, 1, 1, 2), T(2, 2, 1, 2)];
+  const r = move(tiles, 4, 'down');
+  assert.deepEqual(r.tiles, [{ id: 2, r: 3, c: 1, value: 4 }]);
+});
+
 test('move: a no-op move reports moved:false (and no merges)', () => {
   const tiles = [T(1, 0, 0, 2), T(2, 0, 1, 4)];
   const r = move(tiles, 4, 'left');
