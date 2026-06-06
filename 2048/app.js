@@ -178,6 +178,11 @@ function hideOverlay() {
   $('overlay').classList.add('hidden');
   state.keepGoing = true;
   persist();
+  if (!canMove(state.tiles, N)) {
+    state.over = true;
+    announce('Game over. Score ' + state.score + '.');
+    showOverlay('Game over', [{ label: 'New game', ghost: false, action: startNew }]);
+  }
 }
 function announce(msg) { $('status').textContent = msg; }
 
