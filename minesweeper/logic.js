@@ -36,8 +36,56 @@ export function newGame(difficulty) {
   return { rows, cols, mineCount, status: 'new', cells, minesPlaced: false, flagsUsed: 0 };
 }
 
+function placeMines(state, safeId, rng) {
+  const { rows, cols, mineCount } = state;
+  const exclude = new Set([safeId, ...neighborIds(rows, cols, safeId)]);
+  const candidates = [];
+  for (let i = 0; i < rows * cols; i++) if (!exclude.has(i)) candidates.push(i);
+  const mineSet = new Set(shuffle(rng, candidates).slice(0, mineCount));
+  const cells = state.cells.map((cell) => {
+    const mine = mineSet.has(cell.id);
+    const adj = mine ? 0 : neighborIds(rows, cols, cell.id).filter((n) => mineSet.has(n)).length;
+    return { ...cell, mine, adj };
+  });
+  return { ...state, cells, minesPlaced: true, status: 'playing' };
+}
+
+export function checkWin(state) {
+  return state.cells.every((c) => c.mine || c.state === 'revealed');
+}
+
+export function reveal(state, id, rng) {
+  if (state.status === 'won' || state.status === 'lost') return { state, changed: [] };
+  let s = state.minesPlaced ? state : placeMines(state, id, rng);
+  if (s.cells[id].state !== 'hidden') return { state: s, changed: [] };
+
+  const cells = s.cells.map((c) => ({ ...c }));
+  const changed = [];
+
+  if (cells[id].mine) {
+    for (const c of cells)
+      if (c.mine && c.state !== 'revealed') {
+        c.state = 'revealed';
+        changed.push(c.id);
+      }
+    return { state: { ...s, cells, status: 'lost' }, changed };
+  }
+
+  const stack = [id];
+  while (stack.length) {
+    const c = cells[stack.pop()];
+    if (c.state !== 'hidden') continue;
+    c.state = 'revealed';
+    changed.push(c.id);
+    if (c.adj === 0)
+      for (const nid of neighborIds(s.rows, s.cols, c.id))
+        if (cells[nid].state === 'hidden') stack.push(nid);
+  }
+
+  const next = { ...s, cells };
+  return { state: checkWin(next) ? { ...next, status: 'won' } : next, changed };
+}
+
 // Stubs — implemented in later tasks.
-export function reveal() { throw new Error('not yet implemented'); }
 export function toggleFlag() { throw new Error('not yet implemented'); }
 export function chord() { throw new Error('not yet implemented'); }
-export function checkWin() { throw new Error('not yet implemented'); }

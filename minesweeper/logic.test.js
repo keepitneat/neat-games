@@ -35,3 +35,89 @@ test('DIFFICULTIES: three presets with the agreed sizes', () => {
   assert.deepEqual(DIFFICULTIES.medium, { rows: 12, cols: 12, mineCount: 25 });
   assert.deepEqual(DIFFICULTIES.hard, { rows: 16, cols: 16, mineCount: 40 });
 });
+
+// Hand-built 3x3 with a single mine at corner 8, adjacencies precomputed,
+// minesPlaced already true — lets us test flood/win/chord without rng.
+function board3x3() {
+  const mine = new Set([8]);
+  const cells = [];
+  for (let r = 0; r < 3; r++)
+    for (let c = 0; c < 3; c++) {
+      const id = r * 3 + c;
+      cells.push({ id, r, c, mine: mine.has(id), adj: 0, state: 'hidden' });
+    }
+  for (const cell of cells) {
+    if (cell.mine) continue;
+    cell.adj = neighborsOf({ rows: 3, cols: 3 }, cell.id).filter((n) => mine.has(n)).length;
+  }
+  return { rows: 3, cols: 3, mineCount: 1, status: 'playing', cells, minesPlaced: true, flagsUsed: 0 };
+}
+
+test('reveal: first tap is safe AND opens an area; mines appear after', () => {
+  const rng = makeRng(7);
+  const safe = 40; // center of 9x9
+  const { state, changed } = reveal(newGame('easy'), safe, rng);
+  assert.equal(state.minesPlaced, true);
+  assert.equal(state.status, 'playing');
+  assert.equal(state.cells[safe].mine, false);
+  for (const nid of neighborsOf(state, safe)) assert.equal(state.cells[nid].mine, false);
+  assert.equal(state.cells[safe].adj, 0); // opening guaranteed
+  assert.ok(changed.length > 1); // a cascade, not a single cell
+  assert.ok(changed.includes(safe));
+});
+
+test('reveal: places exactly mineCount mines', () => {
+  const rng = makeRng(123);
+  const { state } = reveal(newGame('hard'), 0, rng);
+  assert.equal(state.cells.filter((c) => c.mine).length, 40);
+});
+
+test('reveal: every non-mine adj equals its real mine-neighbor count', () => {
+  const rng = makeRng(42);
+  const { state } = reveal(newGame('easy'), 40, rng);
+  for (const cell of state.cells) {
+    if (cell.mine) continue;
+    const expected = neighborsOf(state, cell.id).filter((n) => state.cells[n].mine).length;
+    assert.equal(cell.adj, expected);
+  }
+});
+
+test('reveal: hitting a mine loses and reveals all mines', () => {
+  const rng = makeRng(99);
+  const { state } = reveal(newGame('easy'), 40, rng);
+  const mineId = state.cells.find((c) => c.mine).id;
+  const res = reveal(state, mineId, rng);
+  assert.equal(res.state.status, 'lost');
+  for (const c of res.state.cells) if (c.mine) assert.equal(c.state, 'revealed');
+});
+
+test('reveal: flood fill clears the zero region and wins when only mines remain', () => {
+  const res = reveal(board3x3(), 0, makeRng(1));
+  for (const c of res.state.cells) {
+    if (c.mine) assert.equal(c.state, 'hidden');
+    else assert.equal(c.state, 'revealed');
+  }
+  assert.equal(res.state.status, 'won');
+});
+
+test('reveal: does not cross or reveal flagged cells', () => {
+  let s = board3x3();
+  s = toggleFlag(s, 1).state; // flag a cell next to the cascade
+  const res = reveal(s, 0, makeRng(1));
+  assert.equal(res.state.cells[1].state, 'flagged');
+  assert.ok(!res.changed.includes(1));
+});
+
+test('reveal: no-op after game over', () => {
+  const lost = { ...board3x3(), status: 'lost' };
+  const res = reveal(lost, 0, makeRng(1));
+  assert.deepEqual(res.changed, []);
+  assert.equal(res.state, lost);
+});
+
+test('checkWin: true only when every non-mine cell is revealed', () => {
+  const s = board3x3();
+  assert.equal(checkWin(s), false);
+  const all = { ...s, cells: s.cells.map((c) => (c.mine ? c : { ...c, state: 'revealed' })) };
+  assert.equal(checkWin(all), true);
+});
