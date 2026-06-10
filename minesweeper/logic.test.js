@@ -184,3 +184,16 @@ test('chord: no-op on a hidden or zero cell', () => {
   const s = board3x3();
   assert.deepEqual(chord(s, 0, makeRng(1)).changed, []); // 0 is hidden
 });
+
+test('chord: can win by clearing the last safe cells', () => {
+  // 3x3, mine at 8. Pre-reveal all safe cells except 7 (r2c1, adj=1).
+  // Flag the mine (8). Chord cell 5 (r1c2, adj=1) — its only hidden neighbor is 7.
+  // Revealing 7 exhausts all safe cells → status should become 'won'.
+  const revealed = new Set([0, 1, 2, 3, 4, 5, 6]);
+  let s = board3x3();
+  s = { ...s, cells: s.cells.map((c) => (revealed.has(c.id) ? { ...c, state: 'revealed' } : c)) };
+  s = toggleFlag(s, 8).state; // correct flag on the mine
+  const res = chord(s, 5, makeRng(1));
+  assert.equal(res.state.cells[7].state, 'revealed');
+  assert.equal(res.state.status, 'won');
+});
