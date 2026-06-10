@@ -18,6 +18,7 @@ const ui = {
   state: null,
   rng: makeRng(randomSeed()),
   flagMode: false,
+  suppressClick: false,
   startedAt: null,
   timerId: null,
   nodes: new Map(), // cell id -> button element
@@ -103,7 +104,8 @@ function tickTimer() {
 
 function startTimer() {
   if (ui.timerId !== null) return;
-  ui.startedAt = Date.now();
+  // If startedAt was already set by the caller (resumed game), preserve it.
+  if (ui.startedAt === null) ui.startedAt = Date.now();
   ui.timerId = setInterval(tickTimer, 250);
 }
 
@@ -121,7 +123,12 @@ function startGame(difficulty, restored) {
   ui.startedAt = null;
   if (restored) {
     ui.state = restored;
-    if (restored.status === 'playing') startTimer();
+    if (restored.status === 'playing') {
+      // Resume clock from saved elapsed so best-time stays honest.
+      // (Time while the tab was closed is not counted — just continue from saved.)
+      ui.startedAt = Date.now() - (restored.elapsedMs || 0);
+      startTimer();
+    }
   } else {
     ui.state = newGame(difficulty);
     ui.rng = makeRng(randomSeed());
@@ -140,7 +147,8 @@ function applyResult(res) {
   renderStatus();
   if (ui.state.status === 'playing') {
     startTimer();
-    saveGame(store, { ...ui.state, difficultyKey: ui.difficulty });
+    const elapsedMs = ui.startedAt === null ? 0 : Date.now() - ui.startedAt;
+    saveGame(store, { ...ui.state, difficultyKey: ui.difficulty, elapsedMs });
   } else if (ui.state.status === 'won' || ui.state.status === 'lost') {
     stopTimer();
     clearGame(store);
@@ -177,6 +185,7 @@ function doReveal(id) {
     applyResult(chord(ui.state, id, ui.rng));
   } else {
     const res = reveal(ui.state, id, ui.rng);
+    // Start before applyResult so startedAt is set even if the first reveal instantly wins.
     if (res.state.status !== 'new' && ui.startedAt === null) startTimer();
     applyResult(res);
   }
@@ -214,10 +223,16 @@ function wireInput() {
 
   // Long-press to flag (touch). Cancels the synthetic click that follows.
   let pressTimer = null;
+  let pressX = 0;
+  let pressY = 0;
   board.addEventListener('pointerdown', (e) => {
     if (e.pointerType === 'mouse') return;
     const id = cellIdFromEvent(e);
     if (id === null) return;
+    // Reset any stuck flag from a previous gesture before starting fresh.
+    ui.suppressClick = false;
+    pressX = e.clientX;
+    pressY = e.clientY;
     pressTimer = setTimeout(() => {
       pressTimer = null;
       ui.suppressClick = true;
@@ -232,7 +247,13 @@ function wireInput() {
   };
   board.addEventListener('pointerup', cancelPress);
   board.addEventListener('pointercancel', cancelPress);
-  board.addEventListener('pointermove', cancelPress);
+  board.addEventListener('pointermove', (e) => {
+    if (e.pointerType === 'mouse') return;
+    // Allow minor finger jitter; only cancel long-press if finger moved >10px.
+    const dx = e.clientX - pressX;
+    const dy = e.clientY - pressY;
+    if (dx * dx + dy * dy > 100) cancelPress();
+  });
 
   $('mode-toggle').addEventListener('click', () => {
     ui.flagMode = !ui.flagMode;
