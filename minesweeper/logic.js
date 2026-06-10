@@ -86,6 +86,17 @@ export function reveal(state, id, rng) {
   return { state: checkWin(next) ? { ...next, status: 'won' } : next, changed };
 }
 
-// Stubs — implemented in later tasks.
-export function toggleFlag() { throw new Error('not yet implemented'); }
+export function toggleFlag(state, id) {
+  if (state.status === 'won' || state.status === 'lost') return { state, changed: [] };
+  if (state.cells[id].state === 'revealed') return { state, changed: [] };
+  const cells = state.cells.map((c) => ({ ...c }));
+  const flagging = cells[id].state === 'hidden';
+  cells[id].state = flagging ? 'flagged' : 'hidden';
+  return {
+    state: { ...state, cells, flagsUsed: state.flagsUsed + (flagging ? 1 : -1) },
+    changed: [id],
+  };
+}
+
+// Stub — implemented in Task 4.
 export function chord() { throw new Error('not yet implemented'); }

@@ -121,3 +121,33 @@ test('checkWin: true only when every non-mine cell is revealed', () => {
   const all = { ...s, cells: s.cells.map((c) => (c.mine ? c : { ...c, state: 'revealed' })) };
   assert.equal(checkWin(all), true);
 });
+
+test('toggleFlag: flags a hidden cell and counts it', () => {
+  const s = board3x3();
+  const r = toggleFlag(s, 0);
+  assert.equal(r.state.cells[0].state, 'flagged');
+  assert.equal(r.state.flagsUsed, 1);
+  assert.deepEqual(r.changed, [0]);
+});
+
+test('toggleFlag: unflags a flagged cell', () => {
+  let s = board3x3();
+  s = toggleFlag(s, 0).state;
+  const r = toggleFlag(s, 0);
+  assert.equal(r.state.cells[0].state, 'hidden');
+  assert.equal(r.state.flagsUsed, 0);
+});
+
+test('toggleFlag: no-op on a revealed cell', () => {
+  const s = reveal(board3x3(), 0, makeRng(1)).state; // most cells now revealed
+  const revealedId = s.cells.find((c) => c.state === 'revealed').id;
+  const r = toggleFlag(s, revealedId);
+  assert.deepEqual(r.changed, []);
+  assert.equal(r.state, s);
+});
+
+test('toggleFlag: no-op after game over', () => {
+  const won = { ...board3x3(), status: 'won' };
+  const r = toggleFlag(won, 0);
+  assert.deepEqual(r.changed, []);
+});
