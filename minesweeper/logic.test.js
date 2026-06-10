@@ -91,6 +91,15 @@ test('reveal: hitting a mine loses and reveals all mines', () => {
   for (const c of res.state.cells) if (c.mine) assert.equal(c.state, 'revealed');
 });
 
+test('reveal: hitting a mine tags hitId with the struck cell', () => {
+  const rng = makeRng(99);
+  const { state } = reveal(newGame('easy'), 40, rng);
+  const mineId = state.cells.find((c) => c.mine).id;
+  const res = reveal(state, mineId, rng);
+  assert.equal(res.state.status, 'lost');
+  assert.equal(res.state.hitId, mineId);
+});
+
 test('reveal: flood fill clears the zero region and wins when only mines remain', () => {
   const res = reveal(board3x3(), 0, makeRng(1));
   for (const c of res.state.cells) {

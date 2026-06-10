@@ -38,7 +38,16 @@ test('recordResult: difficulties are tracked separately', () => {
 
 test('saveGame/loadGame: round-trips the in-progress board', () => {
   const s = freshStore();
-  const state = { rows: 9, cols: 9, status: 'playing', cells: [], minesPlaced: true, flagsUsed: 2 };
+  const state = {
+    rows: 2, cols: 2, mineCount: 1, status: 'playing', minesPlaced: true, flagsUsed: 1,
+    difficultyKey: 'easy', elapsedMs: 4200,
+    cells: [
+      { id: 0, r: 0, c: 0, mine: false, adj: 1, state: 'revealed' },
+      { id: 1, r: 0, c: 1, mine: true, adj: 0, state: 'flagged' },
+      { id: 2, r: 1, c: 0, mine: false, adj: 1, state: 'hidden' },
+      { id: 3, r: 1, c: 1, mine: false, adj: 1, state: 'hidden' },
+    ],
+  };
   saveGame(s, state);
   assert.deepEqual(loadGame(s), state);
 });

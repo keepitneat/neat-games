@@ -68,7 +68,7 @@ export function reveal(state, id, rng) {
         c.state = 'revealed';
         changed.push(c.id);
       }
-    return { state: { ...s, cells, status: 'lost' }, changed };
+    return { state: { ...s, cells, status: 'lost', hitId: id }, changed };
   }
 
   const stack = [id];

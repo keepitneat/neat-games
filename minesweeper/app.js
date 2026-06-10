@@ -12,6 +12,7 @@ import { loadStats, recordResult, saveGame, loadGame, clearGame } from './persis
 const $ = (id) => document.getElementById(id);
 const store = makeStore(localStorage, 'minesweeper');
 const LONG_PRESS_MS = 400;
+const MOVE_CANCEL_PX = 10; // finger travel that cancels a long-press
 
 const ui = {
   difficulty: 'easy',
@@ -40,7 +41,6 @@ function buildBoard() {
     el.type = 'button';
     el.className = 'ms-cell';
     el.dataset.id = cell.id;
-    el.setAttribute('role', 'gridcell');
     paintCell(el, cell);
     frag.appendChild(el);
     ui.nodes.set(cell.id, el);
@@ -61,6 +61,7 @@ function paintCell(el, cell) {
     if (cell.mine) {
       el.textContent = '💣';
       el.classList.add('mine');
+      if (ui.state.hitId === cell.id) el.classList.add('mine-hit');
       label = 'mine';
     } else if (cell.adj > 0) {
       el.textContent = String(cell.adj);
@@ -73,7 +74,7 @@ function paintCell(el, cell) {
   } else {
     el.textContent = '';
   }
-  el.setAttribute('aria-label', label);
+  el.setAttribute('aria-label', `Row ${cell.r + 1}, column ${cell.c + 1}: ${label}`);
 }
 
 function repaint(changed) {
@@ -146,6 +147,8 @@ function applyResult(res) {
   ui.state = res.state;
   repaint(res.changed);
   renderStatus();
+  // The clock owns one start point: the moment mines are placed (first real reveal).
+  if (ui.state.minesPlaced && ui.startedAt === null) ui.startedAt = Date.now();
   if (ui.state.status === 'playing') {
     startTimer();
     const elapsedMs = ui.startedAt === null ? 0 : Date.now() - ui.startedAt;
@@ -172,12 +175,9 @@ function endGame() {
       playAgain
     );
   } else {
-    // reveal all mines for the loss view
-    const cells = ui.state.cells.map((c) =>
-      c.mine && c.state !== 'revealed' ? { ...c, state: 'revealed' } : c
-    );
-    ui.state = { ...ui.state, cells };
-    cells.forEach((c) => paintCell(ui.nodes.get(c.id), c));
+    // Engine already revealed all mines + tagged the hit; repaint every cell so
+    // wrong flags and the struck mine render.
+    ui.state.cells.forEach((c) => paintCell(ui.nodes.get(c.id), c));
     $('live').textContent = 'Boom — you hit a mine.';
     showOverlay('💥 Boom', 'You hit a mine.', [
       { label: 'Try again', action: () => startGame(ui.difficulty) },
@@ -196,7 +196,6 @@ function showOverlay(title, sub, actions) {
     const b = document.createElement('button');
     b.type = 'button';
     b.textContent = a.label;
-    if (a.ghost) b.className = 'ghost';
     b.addEventListener('click', a.action);
     row.appendChild(b);
   }
@@ -214,10 +213,7 @@ function doReveal(id) {
   if (cell.state === 'revealed' && cell.adj > 0) {
     applyResult(chord(ui.state, id, ui.rng));
   } else {
-    const res = reveal(ui.state, id, ui.rng);
-    // Start before applyResult so startedAt is set even if the first reveal instantly wins.
-    if (res.state.status !== 'new' && ui.startedAt === null) startTimer();
-    applyResult(res);
+    applyResult(reveal(ui.state, id, ui.rng));
   }
 }
 
@@ -282,7 +278,7 @@ function wireInput() {
     // Allow minor finger jitter; only cancel long-press if finger moved >10px.
     const dx = e.clientX - pressX;
     const dy = e.clientY - pressY;
-    if (dx * dx + dy * dy > 100) cancelPress();
+    if (dx * dx + dy * dy > MOVE_CANCEL_PX * MOVE_CANCEL_PX) cancelPress();
   });
 
   $('mode-toggle').addEventListener('click', () => {
@@ -327,7 +323,13 @@ function boot() {
   wireTheme();
   wireInput();
   const saved = loadGame(store);
-  if (saved && saved.status === 'playing' && DIFFICULTIES[saved.difficultyKey]) {
+  if (
+    saved &&
+    saved.status === 'playing' &&
+    DIFFICULTIES[saved.difficultyKey] &&
+    Array.isArray(saved.cells) &&
+    saved.cells.length === saved.rows * saved.cols
+  ) {
     startGame(saved.difficultyKey, saved);
   } else {
     startGame('easy');
