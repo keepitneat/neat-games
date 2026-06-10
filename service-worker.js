@@ -2,7 +2,7 @@
  * Bump CACHE_VERSION on any change to the import graph (new module -> add to
  * APP_SHELL AND bump the version). */
 
-const CACHE_VERSION = 'v8';
+const CACHE_VERSION = 'v9';
 const CACHE_NAME = `neat-games-${CACHE_VERSION}`;
 
 const APP_SHELL = [
@@ -33,6 +33,12 @@ const APP_SHELL = [
   '/2048/app.js',
   '/2048/logic.js',
   '/2048/persist.js',
+  '/minesweeper/',
+  '/minesweeper/index.html',
+  '/minesweeper/minesweeper.css',
+  '/minesweeper/app.js',
+  '/minesweeper/logic.js',
+  '/minesweeper/persist.js',
   '/icons/icon-192.png',
   '/icons/icon-512.png',
   '/icons/icon-maskable-512.png',
