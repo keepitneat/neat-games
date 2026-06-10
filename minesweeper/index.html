@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Minesweeper — Neat Games</title>
+  <meta name="description" content="Clear the field without hitting a mine. No ads, no tracking.">
+
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#047857">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+
+  <script>
+    (function () {
+      var saved = localStorage.getItem('theme');
+      if (saved && saved !== 'system') document.documentElement.setAttribute('data-theme', saved);
+    })();
+  </script>
+
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/minesweeper/minesweeper.css">
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <div class="left">
+        <a class="iconbtn" href="/" aria-label="Back to Neat Games">&larr;</a>
+        <h1>Minesweeper</h1>
+      </div>
+      <div class="left">
+        <span class="seg" role="group" aria-label="Theme">
+          <button data-theme-set="system" aria-pressed="true">Sys</button>
+          <button data-theme-set="light" aria-pressed="false">Light</button>
+          <button data-theme-set="dark" aria-pressed="false">Dark</button>
+        </span>
+      </div>
+    </div>
+
+    <div class="ms-toolbar">
+      <span class="seg" role="group" aria-label="Difficulty">
+        <button data-diff="easy" aria-pressed="true">Easy</button>
+        <button data-diff="medium" aria-pressed="false">Medium</button>
+        <button data-diff="hard" aria-pressed="false">Hard</button>
+      </span>
+      <button id="new-game" class="newgame" type="button">New game</button>
+    </div>
+
+    <div class="ms-status">
+      <div class="stat"><span class="label">Mines</span><span class="value" id="mines-left">0</span></div>
+      <div class="stat"><span class="label">Time</span><span class="value" id="timer">0:00</span></div>
+      <div class="stat"><span class="label">Best</span><span class="value" id="best">—</span></div>
+      <div class="stat"><span class="label">Wins</span><span class="value" id="wins">0</span></div>
+    </div>
+
+    <div id="board" class="ms-board" role="grid" aria-label="Minesweeper board"></div>
+
+    <div class="ms-mode">
+      <button id="mode-toggle" type="button" aria-pressed="false"
+              aria-label="Toggle flag mode">
+        <span class="mode-reveal">⛏ Reveal</span>
+        <span class="mode-flag">🚩 Flag</span>
+      </button>
+      <span class="hint">Tap to reveal · long-press to flag · tap a number to chord</span>
+    </div>
+
+    <p id="live" class="status-live" role="status" aria-live="polite"></p>
+
+    <details class="howto">
+      <summary>How to play</summary>
+      <ol>
+        <li>Tap a square to reveal it. Numbers show how many mines touch that square.</li>
+        <li>Flag squares you think are mines: right-click, long-press, or switch to flag mode.</li>
+        <li>Tap a revealed number with the right flags around it to clear the rest (chording).</li>
+        <li>Clear every safe square to win. Hit a mine and it's over.</li>
+      </ol>
+    </details>
+  </div>
+
+  <footer class="site-footer">
+    Part of <a href="https://keepitneat.app">Keep It Neat</a> — no ads, no tracking.
+  </footer>
+
+  <script type="module" src="/minesweeper/app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('/service-worker.js', { scope: '/' });
+      });
+    }
+  </script>
+</body>
+</html>
