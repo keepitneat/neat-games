@@ -151,3 +151,36 @@ test('toggleFlag: no-op after game over', () => {
   const r = toggleFlag(won, 0);
   assert.deepEqual(r.changed, []);
 });
+
+test('chord: reveals non-flagged neighbors when flag count matches the number', () => {
+  // 3x3, mine at 8. Reveal cell 4 only (adj=1). Flag the mine (8). Chord 4.
+  let s = board3x3();
+  s = { ...s, cells: s.cells.map((c) => (c.id === 4 ? { ...c, state: 'revealed' } : c)) };
+  s = toggleFlag(s, 8).state; // correct flag on the mine
+  const res = chord(s, 4, makeRng(1));
+  for (const nid of neighborsOf(res.state, 4))
+    if (!res.state.cells[nid].mine) assert.equal(res.state.cells[nid].state, 'revealed');
+  assert.notEqual(res.state.status, 'lost');
+});
+
+test('chord: a wrong flag makes chording reveal a mine and lose', () => {
+  // 3x3, mine at 8. Reveal 4 (adj=1). Wrongly flag 0 (no mine) so count matches adj=1.
+  let s = board3x3();
+  s = { ...s, cells: s.cells.map((c) => (c.id === 4 ? { ...c, state: 'revealed' } : c)) };
+  s = toggleFlag(s, 0).state; // wrong flag
+  const res = chord(s, 4, makeRng(1));
+  assert.equal(res.state.status, 'lost');
+});
+
+test('chord: no-op when flag count does not match', () => {
+  let s = board3x3();
+  s = { ...s, cells: s.cells.map((c) => (c.id === 4 ? { ...c, state: 'revealed' } : c)) };
+  const res = chord(s, 4, makeRng(1)); // no flags placed, adj=1
+  assert.deepEqual(res.changed, []);
+  assert.equal(res.state, s);
+});
+
+test('chord: no-op on a hidden or zero cell', () => {
+  const s = board3x3();
+  assert.deepEqual(chord(s, 0, makeRng(1)).changed, []); // 0 is hidden
+});

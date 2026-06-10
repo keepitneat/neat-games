@@ -98,5 +98,22 @@ export function toggleFlag(state, id) {
   };
 }
 
-// Stub — implemented in Task 4.
-export function chord() { throw new Error('not yet implemented'); }
+export function chord(state, id, rng) {
+  if (state.status !== 'playing') return { state, changed: [] };
+  const cell = state.cells[id];
+  if (cell.state !== 'revealed' || cell.adj === 0) return { state, changed: [] };
+  const nids = neighborIds(state.rows, state.cols, id);
+  const flagged = nids.filter((n) => state.cells[n].state === 'flagged').length;
+  if (flagged !== cell.adj) return { state, changed: [] };
+
+  let s = state;
+  const changed = [];
+  for (const nid of nids) {
+    if (s.cells[nid].state !== 'hidden') continue;
+    const res = reveal(s, nid, rng);
+    s = res.state;
+    changed.push(...res.changed);
+    if (s.status === 'lost') break;
+  }
+  return { state: s, changed };
+}
