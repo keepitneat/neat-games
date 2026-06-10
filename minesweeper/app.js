@@ -134,6 +134,7 @@ function startGame(difficulty, restored) {
     ui.rng = makeRng(randomSeed());
     clearGame(store);
   }
+  hideOverlay();
   buildBoard();
   tickTimer();
   renderStatus();
@@ -158,13 +159,18 @@ function applyResult(res) {
 
 function endGame() {
   const won = ui.state.status === 'won';
+  const playAgain = [{ label: 'Play again', action: () => startGame(ui.difficulty) }];
   if (won) {
     const elapsed = ui.startedAt === null ? 0 : Date.now() - ui.startedAt;
     const before = loadStats(store, ui.difficulty);
-    const after = recordResult(store, ui.difficulty, { won: true, timeMs: elapsed });
+    recordResult(store, ui.difficulty, { won: true, timeMs: elapsed });
     const record = before.bestMs === null || elapsed < before.bestMs;
     $('live').textContent = record ? `You win! New best: ${fmtTime(elapsed)}` : 'You win!';
-    void after;
+    showOverlay(
+      'You win! 🎉',
+      record ? `New best · ${fmtTime(elapsed)}` : `Time · ${fmtTime(elapsed)}`,
+      playAgain
+    );
   } else {
     // reveal all mines for the loss view
     const cells = ui.state.cells.map((c) =>
@@ -173,8 +179,32 @@ function endGame() {
     ui.state = { ...ui.state, cells };
     cells.forEach((c) => paintCell(ui.nodes.get(c.id), c));
     $('live').textContent = 'Boom — you hit a mine.';
+    showOverlay('💥 Boom', 'You hit a mine.', [
+      { label: 'Try again', action: () => startGame(ui.difficulty) },
+    ]);
   }
   renderStatus();
+}
+
+// ---------- win/loss overlay ----------
+function showOverlay(title, sub, actions) {
+  $('overlay-title').textContent = title;
+  $('overlay-sub').textContent = sub;
+  const row = $('overlay-actions');
+  row.replaceChildren();
+  for (const a of actions) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = a.label;
+    if (a.ghost) b.className = 'ghost';
+    b.addEventListener('click', a.action);
+    row.appendChild(b);
+  }
+  $('overlay').classList.remove('hidden');
+}
+
+function hideOverlay() {
+  $('overlay').classList.add('hidden');
 }
 
 // ---------- input ----------

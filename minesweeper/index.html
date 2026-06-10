@@ -54,7 +54,14 @@
       <div class="stat"><span class="label">Wins</span><span class="value" id="wins">0</span></div>
     </div>
 
-    <div id="board" class="ms-board" role="grid" aria-label="Minesweeper board"></div>
+    <div class="ms-board-wrap">
+      <div id="board" class="ms-board" role="grid" aria-label="Minesweeper board"></div>
+      <div id="overlay" class="overlay hidden">
+        <h2 id="overlay-title"></h2>
+        <p id="overlay-sub" class="overlay-sub"></p>
+        <div class="row" id="overlay-actions"></div>
+      </div>
+    </div>
 
     <div class="ms-mode">
       <button id="mode-toggle" type="button" aria-pressed="false"
@@ -62,7 +69,7 @@
         <span class="mode-reveal">⛏ Reveal</span>
         <span class="mode-flag">🚩 Flag</span>
       </button>
-      <span class="hint">Tap to reveal · long-press to flag · tap a number to chord</span>
+      <span class="hint">Click/tap to reveal · right-click or long-press to flag · click a number to chord</span>
     </div>
 
     <p id="live" class="status-live" role="status" aria-live="polite"></p>
