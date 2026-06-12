@@ -6,6 +6,7 @@ import { makeRng } from '../shared/rng.js';
 import { makeStore } from '../shared/store.js';
 import { move, spawnTile, newGame, canMove, hasReached } from './logic.js';
 import { loadBest, recordBest, saveGame, loadGame } from './persist.js';
+import { wireThemeToggle } from '../shared/theme.js';
 
 const N = 4;
 const SLIDE_MS = 120;
@@ -202,21 +203,6 @@ function startNew() {
   persist();
 }
 
-// --- theme toggle (shares the hub's 'theme' key) ---
-function setTheme(t) {
-  if (t === 'system') localStorage.removeItem('theme');
-  else localStorage.setItem('theme', t);
-  if (t === 'system') document.documentElement.removeAttribute('data-theme');
-  else document.documentElement.setAttribute('data-theme', t);
-  paintTheme();
-}
-function paintTheme() {
-  const cur = localStorage.getItem('theme') || 'system';
-  document.querySelectorAll('[data-theme-set]').forEach((b) => {
-    b.setAttribute('aria-pressed', String(b.dataset.themeSet === cur));
-  });
-}
-
 // --- input ---
 const KEY_DIR = {
   ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down',
@@ -252,16 +238,13 @@ function wire() {
   board.addEventListener('touchstart', onTouchStart, { passive: true });
   board.addEventListener('touchend', onTouchEnd, { passive: true });
   $('new-game').addEventListener('click', startNew);
-  document.querySelectorAll('[data-theme-set]').forEach((b) => {
-    b.addEventListener('click', () => setTheme(b.dataset.themeSet));
-  });
+  wireThemeToggle();
   window.addEventListener('beforeunload', persist);
 }
 
 // --- boot ---
 function boot() {
   buildCells();
-  paintTheme();
   wire();
   const saved = loadGame(store);
   if (saved && Array.isArray(saved.tiles) && saved.tiles.length) {

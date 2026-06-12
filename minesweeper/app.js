@@ -8,6 +8,7 @@ import { makeRng } from '../shared/rng.js';
 import { makeStore } from '../shared/store.js';
 import { DIFFICULTIES, newGame, reveal, toggleFlag, chord } from './logic.js';
 import { loadStats, recordResult, saveGame, loadGame, clearGame } from './persist.js';
+import { wireThemeToggle } from '../shared/theme.js';
 
 const $ = (id) => document.getElementById(id);
 const store = makeStore(localStorage, 'minesweeper');
@@ -299,28 +300,9 @@ function syncDiffButtons() {
   });
 }
 
-// ---------- theme toggle (shared pattern) ----------
-function wireTheme() {
-  const apply = (mode) => {
-    if (mode === 'system') document.documentElement.removeAttribute('data-theme');
-    else document.documentElement.setAttribute('data-theme', mode);
-    localStorage.setItem('theme', mode);
-    document.querySelectorAll('[data-theme-set]').forEach((b) =>
-      b.setAttribute('aria-pressed', String(b.dataset.themeSet === mode))
-    );
-  };
-  document.querySelectorAll('[data-theme-set]').forEach((b) =>
-    b.addEventListener('click', () => apply(b.dataset.themeSet))
-  );
-  const saved = localStorage.getItem('theme') || 'system';
-  document.querySelectorAll('[data-theme-set]').forEach((b) =>
-    b.setAttribute('aria-pressed', String(b.dataset.themeSet === saved))
-  );
-}
-
 // ---------- boot ----------
 function boot() {
-  wireTheme();
+  wireThemeToggle();
   wireInput();
   const saved = loadGame(store);
   if (

@@ -17,6 +17,7 @@ import {
   saveGame, loadGame,
   recordDailySolve, loadStreak, recordBestTime,
 } from './persist.js';
+import { wireThemeToggle } from '../shared/theme.js';
 
 const DIFFICULTY = { easy: 6, medium: 7, hard: 8 };
 const DIFFICULTY_ORDER = ['easy', 'medium', 'hard'];
@@ -214,10 +215,6 @@ function renderSettings() {
   const skin = normalizeSkin(state.settings.skin);
   $('skin-crown').setAttribute('aria-pressed', String(skin === 'crown'));
   $('skin-cat').setAttribute('aria-pressed', String(skin === 'cat'));
-  const theme = localStorage.getItem('theme') || 'system';
-  document.querySelectorAll('[data-theme-set]').forEach((b) => {
-    b.setAttribute('aria-pressed', String(b.dataset.themeSet === theme));
-  });
 }
 
 function renderWin() {
@@ -330,14 +327,6 @@ function setSkin(skin) {
   render();
 }
 
-function setTheme(theme) {
-  if (theme === 'system') localStorage.removeItem('theme');
-  else localStorage.setItem('theme', theme);
-  if (theme === 'system') document.documentElement.removeAttribute('data-theme');
-  else document.documentElement.setAttribute('data-theme', theme);
-  renderSettings();
-}
-
 // --- wiring ---
 
 function wire() {
@@ -379,9 +368,7 @@ function wire() {
   $('set-timer').addEventListener('change', () => toggleSetting('showTimer'));
   $('skin-crown').addEventListener('click', () => setSkin('crown'));
   $('skin-cat').addEventListener('click', () => setSkin('cat'));
-  document.querySelectorAll('[data-theme-set]').forEach((b) => {
-    b.addEventListener('click', () => setTheme(b.dataset.themeSet));
-  });
+  wireThemeToggle();
   window.addEventListener('beforeunload', persistGame);
 }
 
