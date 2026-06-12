@@ -49,6 +49,8 @@
 .win {
   text-align: center; background: var(--accent-soft); color: var(--accent);
   border-radius: var(--radius); padding: 0.8rem; margin: 0.6rem 0;
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  box-shadow: 0 10px 26px rgba(4, 120, 87, 0.10);
 }
 .win.hidden { display: none; }
 .win h2 { margin: 0 0 0.4rem; }
@@ -68,16 +70,7 @@
 }
 
 /* ── Direction B polish (soft-toy, Fredoka) — overrides above ───── */
-body {
-  background: radial-gradient(125% 125% at 0% 0%, #eafaf3 0%, #cdeede 100%);
-  min-height: 100vh;
-}
-@media (prefers-color-scheme: dark) {
-  body { background: radial-gradient(125% 125% at 0% 0%, #10201b 0%, #0b1512 100%); }
-}
-[data-theme="light"] body { background: radial-gradient(125% 125% at 0% 0%, #eafaf3 0%, #cdeede 100%); }
-[data-theme="dark"] body { background: radial-gradient(125% 125% at 0% 0%, #10201b 0%, #0b1512 100%); }
-
+/* Page background uses the shared neutral --bg (styles.css), same as every game. */
 .win h2, .howto summary { font-family: var(--font-display); }
 .pill { font-family: var(--font-display); font-weight: 600; }
 
