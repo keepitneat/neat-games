@@ -162,7 +162,9 @@ function applyResult(res) {
 
 function endGame() {
   const won = ui.state.status === 'won';
-  const playAgain = [{ label: 'Play again', action: () => startGame(ui.difficulty) }];
+  // OK only dismisses the banner so the finished board stays visible;
+  // a fresh game starts from the toolbar "New game" button.
+  const dismiss = [{ label: 'OK', action: hideOverlay }];
   if (won) {
     const elapsed = ui.startedAt === null ? 0 : Date.now() - ui.startedAt;
     const before = loadStats(store, ui.difficulty);
@@ -172,16 +174,14 @@ function endGame() {
     showOverlay(
       'You win! 🎉',
       record ? `New best · ${fmtTime(elapsed)}` : `Time · ${fmtTime(elapsed)}`,
-      playAgain
+      dismiss
     );
   } else {
     // Engine already revealed all mines + tagged the hit; repaint every cell so
     // wrong flags and the struck mine render.
     ui.state.cells.forEach((c) => paintCell(ui.nodes.get(c.id), c));
     $('live').textContent = 'Boom — you hit a mine.';
-    showOverlay('💥 Boom', 'You hit a mine.', [
-      { label: 'Try again', action: () => startGame(ui.difficulty) },
-    ]);
+    showOverlay('💥 Boom', 'You hit a mine.', dismiss);
   }
   renderStatus();
 }

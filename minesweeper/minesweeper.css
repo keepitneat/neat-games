@@ -4,6 +4,33 @@
    that file so the game is self-contained. When/if these are promoted to the
    shared sheet they can be removed from here. */
 
+/* Board palette (Stone) + per-theme number colors. Mirrors styles.css theming:
+   :root = light, prefers-color-scheme dark = system dark, [data-theme] = explicit. */
+:root {
+  --ms-covered: #ccd0d5;
+  --ms-open: #eef0f2;
+  --ms-n1: #1d4ed8; --ms-n2: #15803d; --ms-n3: #b91c1c; --ms-n4: #6d28d9;
+  --ms-n5: #9a3412; --ms-n6: #0e7490; --ms-n7: #334155; --ms-n8: #6b7280;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ms-covered: #3b3f45;
+    --ms-open: #2a2d31;
+    --ms-n1: #7aa2f7; --ms-n2: #6bd089; --ms-n3: #f7768e; --ms-n4: #bb9af7;
+    --ms-n5: #e0af68; --ms-n6: #56d4dd; --ms-n7: #c0caf5; --ms-n8: #aab2cf;
+  }
+}
+[data-theme="light"] {
+  --ms-covered: #ccd0d5; --ms-open: #eef0f2;
+  --ms-n1: #1d4ed8; --ms-n2: #15803d; --ms-n3: #b91c1c; --ms-n4: #6d28d9;
+  --ms-n5: #9a3412; --ms-n6: #0e7490; --ms-n7: #334155; --ms-n8: #6b7280;
+}
+[data-theme="dark"] {
+  --ms-covered: #3b3f45; --ms-open: #2a2d31;
+  --ms-n1: #7aa2f7; --ms-n2: #6bd089; --ms-n3: #f7768e; --ms-n4: #bb9af7;
+  --ms-n5: #e0af68; --ms-n6: #56d4dd; --ms-n7: #c0caf5; --ms-n8: #aab2cf;
+}
+
 body {
   min-height: 100vh;
 }
@@ -46,10 +73,38 @@ button.newgame {
   flex-wrap: wrap;
   margin: 0.6rem 0;
 }
+.ms-toolbar,
 .ms-status { justify-content: space-between; }
+
+/* Match the New game button to the difficulty segment's height. */
+.ms-toolbar .newgame {
+  font-size: 0.75rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 10px;
+}
 .ms-status .stat { display: flex; flex-direction: column; align-items: center; min-width: 3.5rem; }
 .ms-status .label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
 .ms-status .value { font-weight: 700; font-variant-numeric: tabular-nums; }
+
+/* Quick-reference controls list under the mode toggle. */
+.ms-hints {
+  list-style: none;
+  margin: 0.7rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.ms-hints .k {
+  display: inline-block;
+  min-width: 4rem;
+  margin-right: 0.5rem;
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--accent);
+}
 
 /* Board: square cells sized by column count via --cols. */
 .ms-board-wrap {
@@ -118,31 +173,31 @@ button.newgame {
   padding: 0;
   cursor: pointer;
   color: var(--fg);
-  background: var(--ms-covered, #bfe6d4);
+  background: var(--ms-covered, #ccd0d5);
   box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.08);
   user-select: none;
   -webkit-user-select: none;
 }
 .ms-cell:focus-visible { outline: 3px solid var(--accent); outline-offset: 1px; }
 .ms-cell.revealed {
-  background: var(--ms-open, #e9efe9);
+  background: var(--ms-open, #eef0f2);
   box-shadow: none;
   cursor: default;
 }
-.ms-cell.flagged { background: var(--ms-covered, #bfe6d4); }
+.ms-cell.flagged { background: var(--ms-covered, #ccd0d5); }
 .ms-cell.mine.revealed { background: #f3b0a6; }
 .ms-cell.mine-hit { background: #e2675a; } /* the mine the player clicked */
 .ms-cell.flag-wrong { background: #e2a06a; } /* flagged but not a mine (shown on loss) */
 
 /* Number colors — the digit always carries the meaning; color is secondary. */
-.ms-cell[data-n="1"] { color: #1d4ed8; }
-.ms-cell[data-n="2"] { color: #15803d; }
-.ms-cell[data-n="3"] { color: #b91c1c; }
-.ms-cell[data-n="4"] { color: #6d28d9; }
-.ms-cell[data-n="5"] { color: #9a3412; }
-.ms-cell[data-n="6"] { color: #0e7490; }
-.ms-cell[data-n="7"] { color: #334155; }
-.ms-cell[data-n="8"] { color: #6b7280; }
+.ms-cell[data-n="1"] { color: var(--ms-n1); }
+.ms-cell[data-n="2"] { color: var(--ms-n2); }
+.ms-cell[data-n="3"] { color: var(--ms-n3); }
+.ms-cell[data-n="4"] { color: var(--ms-n4); }
+.ms-cell[data-n="5"] { color: var(--ms-n5); }
+.ms-cell[data-n="6"] { color: var(--ms-n6); }
+.ms-cell[data-n="7"] { color: var(--ms-n7); }
+.ms-cell[data-n="8"] { color: var(--ms-n8); }
 
 /* Mode toggle reflects active mode via aria-pressed. */
 #mode-toggle { display: inline-flex; gap: 0.4rem; }
