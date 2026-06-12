@@ -78,3 +78,56 @@ button:hover { border-color: var(--accent); }
   color: var(--muted);
   font-size: 0.85rem;
 }
+
+/* ---- App shell (shared chrome) ---- */
+/* Used by every game page. Load order: styles.css → game.css, so games can
+   still override anything here with a more-specific rule if truly needed. */
+
+body { min-height: 100vh; }
+
+.app { max-width: 460px; margin: 0 auto; padding: 0.5rem 0.8rem 2rem; }
+
+.topbar { display: flex; align-items: center; justify-content: space-between; padding: 0.4rem 0; }
+.topbar .left { display: flex; align-items: center; gap: 0.5rem; }
+.topbar h1 { font-family: var(--font-display); font-weight: 700; font-size: 1.5rem; margin: 0; }
+
+.iconbtn {
+  width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center;
+  padding: 0; font-size: 1rem; text-decoration: none;
+}
+
+.seg { display: inline-flex; border: 1px solid var(--accent); border-radius: 10px; overflow: hidden; }
+.seg button {
+  border: 0; border-radius: 0; padding: 0.3rem 0.55rem; font-size: 0.75rem;
+  font-family: var(--font-display); background: transparent; color: var(--accent);
+}
+.seg button[aria-pressed="true"] { background: var(--accent); color: #fff; font-weight: 700; }
+
+button.newgame {
+  font-family: var(--font-display); font-weight: 700; border-radius: 12px;
+  background: var(--accent); color: #fff; border: 1px solid var(--accent); padding: 0.5rem 0.9rem;
+}
+
+.howto { margin-top: 0.9rem; color: var(--muted); font-size: 0.9rem; }
+.howto summary { cursor: pointer; font-weight: 600; color: var(--fg); }
+.howto ol { margin: 0.5rem 0 0; padding-left: 1.2rem; }
+
+.status-live { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+/* Win/loss overlay banner (shared structure; game-specific extensions stay in
+   each game's own CSS — e.g. minesweeper's .overlay-sub, font-size override,
+   and the ms-pop animation). */
+.overlay {
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 0.8rem; text-align: center;
+  background: color-mix(in srgb, var(--card) 86%, transparent);
+  border-radius: 12px; backdrop-filter: blur(1px);
+}
+.overlay.hidden { display: none; }
+.overlay h2 { font-family: var(--font-display); margin: 0; color: var(--fg); }
+.overlay .row { display: flex; gap: 0.5rem; }
+.overlay button {
+  font-family: var(--font-display); font-weight: 700; border-radius: 12px; padding: 0.5rem 0.9rem;
+  background: var(--accent); color: #fff; border: 1px solid var(--accent);
+}
+.overlay button.ghost { background: transparent; color: var(--accent); }
