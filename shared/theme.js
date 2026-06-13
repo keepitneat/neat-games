@@ -15,22 +15,22 @@ export function themeAttr(state) {
   return normalized === 'system' ? null : normalized;
 }
 
-/* DOM helpers — require a browser context (document, localStorage). */
+/* DOM helpers — injectable for testing; default to browser globals. */
 
-/** Apply the given theme state to document.documentElement. */
-export function applyTheme(state) {
-  const attr = themeAttr(normalizeTheme(state));
-  if (attr) document.documentElement.setAttribute('data-theme', attr);
-  else document.documentElement.removeAttribute('data-theme');
+/** Apply the given theme state to the given root element. */
+export function applyTheme(state, root = document.documentElement) {
+  const attr = themeAttr(state);
+  if (attr) root.setAttribute('data-theme', attr);
+  else root.removeAttribute('data-theme');
 }
 
 /**
  * Wire the three-state theme toggle for [data-theme-set] buttons.
- * Reads/writes the 'theme' localStorage key using the FOUC-compatible
+ * Reads/writes the 'theme' storage key using the FOUC-compatible
  * convention: system state = key absent (removeItem), not stored as 'system'.
  * Safe to call once at boot; replaces per-game setTheme/paintTheme/wireTheme.
  */
-export function wireThemeToggle(doc = document) {
+export function wireThemeToggle(doc = document, storage = localStorage) {
   const paint = (active) => {
     doc.querySelectorAll('[data-theme-set]').forEach((b) => {
       b.setAttribute('aria-pressed', String(b.dataset.themeSet === active));
@@ -40,14 +40,14 @@ export function wireThemeToggle(doc = document) {
   doc.querySelectorAll('[data-theme-set]').forEach((b) => {
     b.addEventListener('click', () => {
       const state = normalizeTheme(b.dataset.themeSet);
-      if (state === 'system') localStorage.removeItem('theme');
-      else localStorage.setItem('theme', state);
-      applyTheme(state);
+      if (state === 'system') storage.removeItem('theme');
+      else storage.setItem('theme', state);
+      applyTheme(state, doc.documentElement);
       paint(state);
     });
   });
 
   // Initial paint from stored preference.
-  const saved = normalizeTheme(localStorage.getItem('theme'));
+  const saved = normalizeTheme(storage.getItem('theme'));
   paint(saved);
 }

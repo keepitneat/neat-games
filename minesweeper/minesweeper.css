@@ -1,7 +1,4 @@
-/* minesweeper/minesweeper.css */
-/* App-shell chrome (.app, .topbar, .iconbtn, .seg, button.newgame, .howto,
-   .status-live, .overlay base) now lives in /styles.css. Only game-specific
-   rules remain here. */
+/* minesweeper/minesweeper.css — game-specific rules. Pairs with /styles.css. */
 
 /* Board palette (Stone) + per-theme number colors. Mirrors styles.css theming:
    :root = light, prefers-color-scheme dark = system dark, [data-theme] = explicit. */

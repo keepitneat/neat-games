@@ -1,6 +1,4 @@
 /* Crowns — game-screen layout. Pairs with the shared tokens in /styles.css. */
-/* App-shell chrome (.app, .topbar, .iconbtn, .seg, .howto, .status-live) now
-   lives in /styles.css. Only game-specific rules remain here. */
 [hidden] { display: none !important; }
 
 .statusrow {
@@ -50,7 +48,7 @@
   text-align: center; background: var(--accent-soft); color: var(--accent);
   border-radius: var(--radius); padding: 0.8rem; margin: 0.6rem 0;
   border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
-  box-shadow: 0 10px 26px rgba(4, 120, 87, 0.10);
+  box-shadow: 0 10px 26px color-mix(in srgb, var(--accent) 10%, transparent);
 }
 .win.hidden { display: none; }
 .win h2 { margin: 0 0 0.4rem; }
@@ -69,8 +67,7 @@
   .cell:hover { filter: none; }
 }
 
-/* ── Direction B polish (soft-toy, Fredoka) — overrides above ───── */
-/* Page background uses the shared neutral --bg (styles.css), same as every game. */
+/* Crowns-specific polish (soft-toy, Fredoka) */
 .win h2, .howto summary { font-family: var(--font-display); }
 .pill { font-family: var(--font-display); font-weight: 600; }
 

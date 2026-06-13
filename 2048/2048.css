@@ -1,7 +1,4 @@
 /* 2048 — board + tiles + animation. Pairs with shared tokens in /styles.css. */
-/* App-shell chrome (.app, .topbar, .iconbtn, .seg, button.newgame, .howto,
-   .status-live, .overlay) now lives in /styles.css. */
-/* Page background uses the shared neutral --bg (styles.css), same as every game. */
 .scores { display: flex; gap: 0.6rem; justify-content: flex-end; margin: 0.3rem 0; }
 .score-box {
   background: var(--card); border: 1px solid var(--border); border-radius: 12px;

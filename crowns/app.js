@@ -368,6 +368,7 @@ function wire() {
   $('set-timer').addEventListener('change', () => toggleSetting('showTimer'));
   $('skin-crown').addEventListener('click', () => setSkin('crown'));
   $('skin-cat').addEventListener('click', () => setSkin('cat'));
+  // Theme buttons are painted once here and repainted on click by wireThemeToggle — nothing else mutates the theme.
   wireThemeToggle();
   window.addEventListener('beforeunload', persistGame);
 }
